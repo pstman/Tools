@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>تراز دیجیتال مهندسی هوشمند</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- فونت وزیرمتن -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
@@ -57,13 +55,11 @@
 </head>
 <body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col justify-between p-3 select-none">
 
-  <!-- هشدار در صورت باز شدن در مرورگر داخلی تلگرام یا اینستاگرام -->
   <div id="inAppWarning" class="hidden w-full max-w-md mx-auto mb-2 p-3 bg-amber-500 text-white rounded-2xl shadow-md text-xs leading-relaxed font-semibold">
     ⚠️ <b>توجه:</b> صفحه در مرورگر داخلی پیام‌رسان باز شده که دسترسی ژیروسکوپ را قطع می‌کند. لطفاً از منوی سه‌نقطه بالای صفحه گزینه <b>«باز کردن در Chrome» (Open in browser)</b> را بزنید.
   </div>
 
-  <!-- Header -->
-  <header class="w-full max-w-md mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-3.5 flex items-center justify-between">
+  <header class="w-full max-w-md mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-3.5 flex items-center justify-between z-10 relative">
     <div class="flex items-center gap-2.5">
       <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black shadow-md shadow-blue-500/20">
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -78,7 +74,7 @@
       <div>
         <div class="flex items-center gap-2">
           <h1 class="text-base font-extrabold text-slate-900">تراز دیجیتال گوشی</h1>
-          <span class="text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded-md font-bold tracking-tight">نسخه ۲.۰ (اصلاح‌شده)</span>
+          <span class="text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded-md font-bold tracking-tight">نسخه ۳.۰ (AR)</span>
         </div>
         <p id="sensorStatusText" class="text-xs text-slate-500 font-semibold flex items-center gap-1.5">
           <span id="statusIndicator" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
@@ -87,7 +83,6 @@
       </div>
     </div>
 
-    <!-- Quick Audio & Mode Controls -->
     <div class="flex items-center gap-1.5">
       <button id="toggleSoundBtn" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="صدای بیپ">
         <svg id="soundIcon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -103,8 +98,7 @@
     </div>
   </header>
 
-  <!-- دکمه فعال‌سازی بزرگ با بازخورد کلیک -->
-  <div id="sensorUnlockContainer" class="w-full max-w-md mx-auto my-2.5">
+  <div id="sensorUnlockContainer" class="w-full max-w-md mx-auto my-2.5 z-10 relative">
     <button id="bigSensorStartBtn" class="w-full py-4 px-5 rounded-2xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg shadow-blue-500/30 pulse-btn active:scale-95 transition cursor-pointer">
       <svg id="btnIcon" class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -113,12 +107,11 @@
     </button>
   </div>
 
-  <!-- کنسول گزارش زنده سیستم (برای اینکه دقیقاً ببینید چرا سنسور پیام می‌دهد یا نمی‌‌دهد) -->
-  <div class="w-full max-w-md mx-auto bg-slate-900 text-emerald-400 border border-slate-800 rounded-xl p-3 text-[11px] font-mono shadow-inner flex flex-col gap-1">
+  <div class="w-full max-w-md mx-auto bg-slate-900 text-emerald-400 border border-slate-800 rounded-xl p-3 text-[11px] font-mono shadow-inner flex flex-col gap-1 z-10 relative">
     <div class="flex items-center justify-between text-slate-400 border-b border-slate-800 pb-1 text-[10px]">
       <span class="flex items-center gap-1.5">
         <span id="liveDot" class="w-2 h-2 rounded-full bg-rose-500"></span>
-        وضعیت سنسور سخت‌افزاری
+        وضعیت سیستم
       </span>
       <span id="protocolText" class="text-slate-500">HTTP/S</span>
     </div>
@@ -129,42 +122,39 @@
     </div>
   </div>
 
-  <main class="w-full max-w-md mx-auto flex-1 flex flex-col items-center justify-between gap-3 my-2">
-
-    <!-- تب‌های انتخاب حالت -->
-    <div class="w-full bg-slate-200/90 p-1 rounded-2xl flex items-center gap-1 text-xs">
-      <button data-mode="auto" class="mode-tab flex-1 py-2 rounded-xl font-bold bg-white text-blue-600 shadow-sm transition">خودکار ⚡</button>
-      <button data-mode="circle" class="mode-tab flex-1 py-2 rounded-xl font-medium text-slate-600 hover:text-slate-900 transition">تراز کفی (سطحی)</button>
-      <button data-mode="horizontal" class="mode-tab flex-1 py-2 rounded-xl font-medium text-slate-600 hover:text-slate-900 transition">لبه افقی</button>
-      <button data-mode="vertical" class="mode-tab flex-1 py-2 rounded-xl font-medium text-slate-600 hover:text-slate-900 transition">شاقول دیوار</button>
+  <main class="w-full max-w-md mx-auto flex-1 flex flex-col items-center justify-between gap-3 my-2 z-10 relative">
+    <div class="w-full bg-slate-200/90 p-1 rounded-2xl flex items-center gap-1 text-[11px] flex-wrap">
+      <button data-mode="auto" class="mode-tab flex-1 min-w-[70px] py-2 rounded-xl font-bold bg-white text-blue-600 shadow-sm transition">خودکار</button>
+      <button data-mode="circle" class="mode-tab flex-1 min-w-[70px] py-2 rounded-xl font-medium text-slate-600 hover:text-slate-900 transition">کفی</button>
+      <button data-mode="horizontal" class="mode-tab flex-1 min-w-[70px] py-2 rounded-xl font-medium text-slate-600 hover:text-slate-900 transition">افقی</button>
+      <button data-mode="vertical" class="mode-tab flex-1 min-w-[70px] py-2 rounded-xl font-medium text-slate-600 hover:text-slate-900 transition">شاقول</button>
+      <button data-mode="camera" class="mode-tab flex-1 min-w-[70px] py-2 rounded-xl font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1">
+        دوربین
+        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse hidden" id="cameraActiveDot"></span>
+      </button>
     </div>
 
-    <!-- دایره اصلی تراز -->
-    <div class="w-full flex-1 flex flex-col items-center justify-center relative min-h-[260px]">
-
-      <!-- Mode 1: Circle -->
-      <div id="circularContainer" class="relative w-64 h-64 rounded-full light-tube border-4 border-slate-300 flex items-center justify-center shadow-xl overflow-hidden">
+    <!-- کانتینر اصلی نمایشگرها -->
+    <div class="w-full flex-1 flex flex-col items-center justify-center relative min-h-[260px] max-h-[400px]">
+      
+      <!-- مد تراز حبابی کفی -->
+      <div id="circularContainer" class="absolute inset-0 m-auto w-64 h-64 rounded-full light-tube border-4 border-slate-300 flex items-center justify-center shadow-xl overflow-hidden transition-opacity">
         <div class="absolute inset-0 grid-lines opacity-70 rounded-full"></div>
         <div class="absolute w-48 h-48 rounded-full border border-slate-400/40"></div>
         <div class="absolute w-32 h-32 rounded-full border border-slate-400/60"></div>
         <div class="absolute w-16 h-16 rounded-full border border-slate-400/80"></div>
-
-        <!-- نقطه تراز وسط -->
         <div id="targetCenter" class="absolute w-12 h-12 rounded-full border-2 border-dashed border-slate-400 flex items-center justify-center transition-all duration-150">
           <div class="w-2 h-2 rounded-full bg-slate-500"></div>
         </div>
-
         <div class="absolute w-full h-[1px] bg-slate-400/50 pointer-events-none"></div>
         <div class="absolute h-full w-[1px] bg-slate-400/50 pointer-events-none"></div>
-
-        <!-- گوی شناور تراز (در ابتدا خاکستری و در حالت انتظار) -->
         <div id="circularBubble" class="absolute w-12 h-12 rounded-full bubble-ball is-waiting flex items-center justify-center pointer-events-none z-20">
           <div class="w-3 h-3 rounded-full bg-white/80"></div>
         </div>
       </div>
 
-      <!-- Mode 2: Horizontal -->
-      <div id="horizontalContainer" class="hidden w-full h-28 rounded-2xl light-tube border-4 border-slate-300 relative flex items-center justify-center shadow-xl overflow-hidden px-4">
+      <!-- مد تراز افقی -->
+      <div id="horizontalContainer" class="hidden absolute inset-0 m-auto w-full h-28 rounded-2xl light-tube border-4 border-slate-300 flex items-center justify-center shadow-xl overflow-hidden px-4">
         <div class="absolute h-full w-14 border-x-2 border-slate-400 bg-slate-200/50 flex items-center justify-center">
           <div class="h-6 w-[2px] bg-slate-500"></div>
         </div>
@@ -173,8 +163,8 @@
         </div>
       </div>
 
-      <!-- Mode 3: Vertical -->
-      <div id="verticalContainer" class="hidden h-64 w-28 rounded-2xl light-tube border-4 border-slate-300 relative flex items-center justify-center shadow-xl overflow-hidden py-4">
+      <!-- مد شاقول عمودی -->
+      <div id="verticalContainer" class="hidden absolute inset-0 m-auto h-64 w-28 rounded-2xl light-tube border-4 border-slate-300 flex items-center justify-center shadow-xl overflow-hidden py-4">
         <div class="absolute w-full h-14 border-y-2 border-slate-400 bg-slate-200/50 flex items-center justify-center">
           <div class="w-6 h-[2px] bg-slate-500"></div>
         </div>
@@ -183,23 +173,60 @@
         </div>
       </div>
 
-      <p id="modeDescription" class="text-xs text-slate-500 mt-2 font-medium">گوشی را روی سطح صاف میز قرار دهید</p>
+      <!-- مد جدید: دوربین و زاویه‌سنج تئودولیت -->
+      <div id="cameraContainer" class="hidden absolute inset-0 w-full h-full rounded-2xl overflow-hidden border-4 border-slate-800 shadow-xl bg-black">
+        <video id="camFeed" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline></video>
+        
+        <!-- مگسک هدف‌گیری -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <svg class="w-14 h-14 text-rose-500 drop-shadow-[0_0_8px_rgba(225,29,72,0.8)] opacity-80" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke-dasharray="4 4" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v4m0 8v4m-8-8h4m8 0h4" />
+            <circle cx="12" cy="12" r="1" fill="currentColor" />
+          </svg>
+        </div>
+
+        <!-- پنل کنترل و محاسبه زاویه روی دوربین -->
+        <div class="absolute bottom-2 left-2 right-2 bg-slate-900/85 backdrop-blur-sm rounded-xl p-3 text-white shadow-2xl border border-slate-700">
+          <div class="flex justify-between items-center mb-2.5">
+            <button id="btnSetA" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-xs font-bold transition shadow-md active:scale-95 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-white"></span> ثبت نقطه A
+            </button>
+            <div id="pointAInfo" class="text-[10px] mono-num text-slate-300 bg-slate-800 px-2 py-1 rounded">نقطه‌ای ثبت نشده</div>
+          </div>
+          <div class="flex justify-between items-center border-t border-slate-700 pt-2.5">
+            <button id="btnSetB" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg text-xs font-bold transition shadow-md active:scale-95 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-white"></span> ثبت نقطه B
+            </button>
+            <div id="pointBInfo" class="text-[10px] mono-num text-slate-300 bg-slate-800 px-2 py-1 rounded">نقطه‌ای ثبت نشده</div>
+          </div>
+          <div class="mt-3 bg-slate-800/80 rounded-lg p-2.5 border border-slate-700">
+            <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+              <span>Δ افقی: <b id="diffH" class="text-blue-400">--°</b></span>
+              <span>Δ عمودی: <b id="diffV" class="text-emerald-400">--°</b></span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-300">زاویه فضایی کل:</span>
+              <span id="targetAngleDiff" class="text-2xl font-black text-amber-400 mono-num drop-shadow-md">--.-°</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- نمایشگرهای عددی بزرگ (تا قبل از دریافت سنسور -- نشان داده می‌شوند) -->
-    <div class="w-full grid grid-cols-3 gap-2.5">
+    <!-- نمایشگرهای عددی بزرگ (برای حالت‌های غیر دوربین) -->
+    <div id="standardStats" class="w-full grid grid-cols-3 gap-2.5 transition-opacity">
       <div class="bg-white border border-slate-200 rounded-2xl p-2.5 text-center shadow-sm">
         <div class="text-[11px] text-slate-500 font-semibold">شیب (Pitch)</div>
         <div id="valPitch" class="text-2xl font-black text-slate-400 mono-num my-0.5">--.-°</div>
         <div id="rawBetaText" class="text-[10px] text-slate-400 mono-num">خام: --</div>
       </div>
-
       <div class="bg-white border border-slate-200 rounded-2xl p-2.5 text-center shadow-sm">
         <div class="text-[11px] text-slate-500 font-semibold">چرخش (Roll)</div>
         <div id="valRoll" class="text-2xl font-black text-slate-400 mono-num my-0.5">--.-°</div>
         <div id="rawGammaText" class="text-[10px] text-slate-400 mono-num">خام: --</div>
       </div>
-
       <div class="bg-white border border-slate-200 rounded-2xl p-2.5 text-center shadow-sm">
         <div class="text-[11px] text-slate-500 font-semibold">انحراف کلی</div>
         <div id="valDeviation" class="text-2xl font-black text-slate-400 mono-num my-0.5">--.-°</div>
@@ -207,8 +234,7 @@
       </div>
     </div>
 
-    <!-- بخش کالیبره و صفر کردن -->
-    <div class="w-full bg-white border border-slate-200 rounded-2xl p-3 shadow-sm flex flex-col gap-2.5">
+    <div id="calibrationPanel" class="w-full bg-white border border-slate-200 rounded-2xl p-3 shadow-sm flex flex-col gap-2.5 transition-opacity">
       <div class="flex items-center justify-between text-xs">
         <span class="font-bold text-slate-800 flex items-center gap-1.5">
           <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -218,24 +244,21 @@
         </span>
         <span id="offsetInfo" class="text-[10px] text-slate-500 mono-num">آفست: ۰.۰°</span>
       </div>
-
       <div class="grid grid-cols-2 gap-2">
         <button id="btnCalibrate" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow-md shadow-blue-500/20 active:scale-95 transition flex items-center justify-center gap-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
           </svg>
-          صفر کردن (کالیبره)
+          صفر کردن
         </button>
         <button id="btnResetCalib" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-3 rounded-xl border border-slate-200 active:scale-95 transition flex items-center justify-center gap-1.5">
           ریست کالیبراسیون
         </button>
       </div>
     </div>
-
   </main>
 
   <script>
-    // متغیرهای وضعیت برنامه
     const state = {
       mode: 'auto',
       activeView: 'circle',
@@ -243,6 +266,7 @@
       roll: 0,
       rawBeta: 0,
       rawGamma: 0,
+      rawAlpha: 0,
       offsetBeta: 0,
       offsetGamma: 0,
       packetCount: 0,
@@ -252,14 +276,24 @@
       activeEngine: 'هیچ‌کدام'
     };
 
-    // عناصر DOM
+    let cameraStream = null;
+    let pointA = null;
+    let pointB = null;
+
     const circularBubble = document.getElementById('circularBubble');
     const horizontalBubble = document.getElementById('horizontalBubble');
     const verticalBubble = document.getElementById('verticalBubble');
     const targetCenter = document.getElementById('targetCenter');
+    
     const circularContainer = document.getElementById('circularContainer');
     const horizontalContainer = document.getElementById('horizontalContainer');
     const verticalContainer = document.getElementById('verticalContainer');
+    const cameraContainer = document.getElementById('cameraContainer');
+    const camFeed = document.getElementById('camFeed');
+    const standardStats = document.getElementById('standardStats');
+    const calibrationPanel = document.getElementById('calibrationPanel');
+    const cameraActiveDot = document.getElementById('cameraActiveDot');
+
     const modeTabs = document.querySelectorAll('.mode-tab');
     const valPitch = document.getElementById('valPitch');
     const valRoll = document.getElementById('valRoll');
@@ -274,32 +308,33 @@
     const diagnosticLog = document.getElementById('diagnosticLog');
     const frameCounter = document.getElementById('frameCounter');
     const activeEngineText = document.getElementById('activeEngineText');
-    const protocolText = document.getElementById('protocolText');
+    
     const bigSensorStartBtn = document.getElementById('bigSensorStartBtn');
     const btnText = document.getElementById('btnText');
     const btnIcon = document.getElementById('btnIcon');
     const sensorUnlockContainer = document.getElementById('sensorUnlockContainer');
+    
     const btnCalibrate = document.getElementById('btnCalibrate');
     const btnResetCalib = document.getElementById('btnResetCalib');
     const offsetInfo = document.getElementById('offsetInfo');
     const toggleSoundBtn = document.getElementById('toggleSoundBtn');
     const toggleHapticBtn = document.getElementById('toggleHapticBtn');
-    const inAppWarning = document.getElementById('inAppWarning');
+    
+    const btnSetA = document.getElementById('btnSetA');
+    const btnSetB = document.getElementById('btnSetB');
+    const pointAInfo = document.getElementById('pointAInfo');
+    const pointBInfo = document.getElementById('pointBInfo');
+    const targetAngleDiff = document.getElementById('targetAngleDiff');
+    const diffH = document.getElementById('diffH');
+    const diffV = document.getElementById('diffV');
 
-    // ثبت لاگ روی صفحه در کنسول زنده
     function logMsg(msg, isSuccess = false) {
       diagnosticLog.innerHTML = msg;
       if (isSuccess) {
         diagnosticLog.className = 'text-emerald-400 font-bold';
+      } else {
+        diagnosticLog.className = 'text-slate-300';
       }
-    }
-
-    // بررسی پروتکل و پیام‌رسان‌ها
-    protocolText.textContent = window.location.protocol.replace(':', '').toUpperCase();
-    const ua = navigator.userAgent || '';
-    const isInApp = /Telegram|Instagram|FBAN|FBAV|wv|Rubika|Bale/i.test(ua);
-    if (isInApp) {
-      inAppWarning.classList.remove('hidden');
     }
 
     let audioCtx = null;
@@ -312,9 +347,7 @@
         if (audioCtx && audioCtx.state === 'suspended') {
           audioCtx.resume();
         }
-      } catch (e) {
-        console.warn('Audio error:', e);
-      }
+      } catch (e) {}
     }
 
     let lastBeep = 0;
@@ -323,7 +356,6 @@
       const now = performance.now();
       if (now - lastBeep < 700) return;
       lastBeep = now;
-
       try {
         initAudio();
         if (!audioCtx) return;
@@ -347,15 +379,16 @@
       }
     }
 
-    function onSensorData(pitch, roll, engineName) {
+    function onSensorData(pitch, roll, alpha, engineName) {
       if (typeof pitch !== 'number' || typeof roll !== 'number' || isNaN(pitch) || isNaN(roll)) return;
+      if (state.activeEngine === 'DeviceOrientation' && engineName !== 'DeviceOrientation') return;
 
       state.packetCount++;
       state.rawBeta = pitch;
       state.rawGamma = roll;
+      state.rawAlpha = alpha || 0;
       state.activeEngine = engineName;
 
-      // اولین بسته داده واقعی دریافت شد
       if (!state.hasReceivedRealData) {
         state.hasReceivedRealData = true;
         statusIndicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
@@ -372,7 +405,6 @@
       frameCounter.textContent = state.packetCount;
       activeEngineText.textContent = engineName;
 
-      // محاسبه با احتساب کالیبراسیون
       state.pitch = pitch - state.offsetBeta;
       state.roll = roll - state.offsetGamma;
 
@@ -381,15 +413,14 @@
       valPitch.textContent = `${Math.abs(state.pitch).toFixed(1)}°`;
       valRoll.textContent = `${Math.abs(state.roll).toFixed(1)}°`;
 
-      // تشخیص حالت خودکار
       if (state.mode === 'auto') {
         const absB = Math.abs(pitch);
         const absG = Math.abs(roll);
-        if (absB > 65) {
+        if (absB > 45 && absG < 45) {
           switchView('vertical');
-        } else if (absG > 55) {
+        } else if (absG > 45 && absB < 45) {
           switchView('horizontal');
-        } else {
+        } else if (absB <= 45 && absG <= 45) {
           switchView('circle');
         }
       }
@@ -397,20 +428,63 @@
       renderCanvas();
     }
 
-    // تغییر نمای صفحه
+    function startCamera() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        logMsg('در حال درخواست دسترسی دوربین...');
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(stream => {
+            cameraStream = stream;
+            camFeed.srcObject = stream;
+            logMsg('دوربین متصل شد ✓', true);
+          })
+          .catch(err => {
+            logMsg('خطا در دسترسی به دوربین (احتمالاً HTTPS نیست یا مجوز رد شد)');
+            console.error(err);
+          });
+      } else {
+        logMsg('مرورگر شما از دوربین پشتیبانی نمی‌کند.');
+      }
+    }
+
+    function stopCamera() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+        camFeed.srcObject = null;
+      }
+    }
+
     function switchView(view) {
+      if (state.activeView === view) return;
+      
+      // اگر از مد دوربین خارج شدیم دوربین رو خاموش کن تا باتری مصرف نشه
+      if (state.activeView === 'camera') {
+        stopCamera();
+        standardStats.classList.remove('hidden');
+        calibrationPanel.classList.remove('hidden');
+        cameraActiveDot.classList.add('hidden');
+      }
+
       state.activeView = view;
       circularContainer.classList.add('hidden');
       horizontalContainer.classList.add('hidden');
       verticalContainer.classList.add('hidden');
+      cameraContainer.classList.add('hidden');
 
       if (view === 'circle') circularContainer.classList.remove('hidden');
       if (view === 'horizontal') horizontalContainer.classList.remove('hidden');
       if (view === 'vertical') verticalContainer.classList.remove('hidden');
+      if (view === 'camera') {
+        cameraContainer.classList.remove('hidden');
+        standardStats.classList.add('hidden');
+        calibrationPanel.classList.add('hidden');
+        cameraActiveDot.classList.remove('hidden');
+        startCamera();
+      }
     }
 
     function renderCanvas() {
-      if (!state.hasReceivedRealData) return;
+      if (!state.hasReceivedRealData || state.activeView === 'camera') return;
 
       let deviation = 0;
       let isLevel = false;
@@ -419,7 +493,6 @@
       if (state.activeView === 'circle') {
         deviation = Math.sqrt(state.pitch * state.pitch + state.roll * state.roll);
         isLevel = deviation < TOLERANCE;
-
         const maxDist = 95;
         let dx = -state.roll * 1.5;
         let dy = -state.pitch * 1.5;
@@ -439,7 +512,7 @@
       } else if (state.activeView === 'vertical') {
         deviation = Math.abs(Math.abs(state.pitch) - 90);
         isLevel = deviation < TOLERANCE;
-        let dy = Math.max(-95, Math.min(95, (Math.abs(state.pitch) - 90) * 2));
+        let dy = Math.max(-95, Math.min(95, (Math.abs(state.pitch) - 90) * -2));
         verticalBubble.style.transform = `translateY(${dy}px)`;
       }
 
@@ -470,130 +543,100 @@
       }
     }
 
-    // موتور ۱: رویداد استاندارد DeviceOrientation
+    // منطق محاسبه زاویه در حالت دوربین
+    function calculateCameraAngles() {
+      if (!pointA || !pointB) return;
+      
+      // محاسبه اختلاف افقی (yaw)
+      let dAlpha = Math.abs(pointB.alpha - pointA.alpha);
+      if (dAlpha > 180) dAlpha = 360 - dAlpha; // کوتاه‌ترین مسیر چرخش
+      
+      // محاسبه اختلاف عمودی (pitch)
+      let dBeta = Math.abs(pointB.beta - pointA.beta);
+
+      diffH.textContent = dAlpha.toFixed(1) + '°';
+      diffV.textContent = dBeta.toFixed(1) + '°';
+      
+      // محاسبه زاویه فضایی تقریبی با قضیه فیثاغورث روی کره (برای فواصل معقول)
+      let totalAngle = Math.sqrt(dAlpha * dAlpha + dBeta * dBeta);
+      targetAngleDiff.textContent = totalAngle.toFixed(1) + '°';
+    }
+
+    btnSetA.addEventListener('click', () => {
+      triggerVibrate();
+      pointA = { alpha: state.rawAlpha, beta: state.rawBeta };
+      pointAInfo.textContent = `α:${pointA.alpha.toFixed(0)}° / β:${pointA.beta.toFixed(0)}°`;
+      pointAInfo.classList.add('bg-blue-900/50', 'text-blue-200');
+      calculateCameraAngles();
+    });
+
+    btnSetB.addEventListener('click', () => {
+      triggerVibrate();
+      pointB = { alpha: state.rawAlpha, beta: state.rawBeta };
+      pointBInfo.textContent = `α:${pointB.alpha.toFixed(0)}° / β:${pointB.beta.toFixed(0)}°`;
+      pointBInfo.classList.add('bg-emerald-900/50', 'text-emerald-200');
+      calculateCameraAngles();
+    });
+
     function setupDeviceOrientation() {
       const handler = (e) => {
+        const a = e.alpha || 0;
         const b = e.beta;
         const g = e.gamma;
         if (typeof b === 'number' && typeof g === 'number' && !isNaN(b) && !isNaN(g)) {
-          onSensorData(b, g, 'DeviceOrientation');
+          onSensorData(b, g, a, 'DeviceOrientation');
         }
       };
       window.addEventListener('deviceorientation', handler, false);
       window.addEventListener('deviceorientationabsolute', handler, false);
-      document.addEventListener('deviceorientation', handler, false);
     }
 
-    // موتور ۲: شتاب‌سنج گرانشی DeviceMotion (فعال روی تمام گوشی‌های اندروید)
     function setupDeviceMotion() {
       const motionHandler = (e) => {
         if (state.hasReceivedRealData && state.activeEngine === 'DeviceOrientation') return;
         const acc = e.accelerationIncludingGravity || e.acceleration;
         if (!acc || typeof acc.x !== 'number' || typeof acc.y !== 'number' || typeof acc.z !== 'number') return;
         
-        // محاسبه شیب بر اساس بردار گرانش زمین
         const rollDeg = (Math.atan2(acc.x, Math.sqrt(acc.y * acc.y + acc.z * acc.z)) * 180) / Math.PI;
         const pitchDeg = (Math.atan2(acc.y, Math.sqrt(acc.x * acc.x + acc.z * acc.z)) * 180) / Math.PI;
-        onSensorData(pitchDeg, rollDeg, 'شتاب‌سنج (Motion)');
+        onSensorData(pitchDeg, rollDeg, 0, 'شتاب‌سنج (Motion)');
       };
       window.addEventListener('devicemotion', motionHandler, false);
-      document.addEventListener('devicemotion', motionHandler, false);
-    }
-
-    // موتور ۳: سنسور مدرن کروم اندروید (Generic Sensor API)
-    function setupGenericSensor() {
-      if ('Accelerometer' in window) {
-        try {
-          const accSensor = new Accelerometer({ frequency: 60 });
-          accSensor.addEventListener('reading', () => {
-            const x = accSensor.x;
-            const y = accSensor.y;
-            const z = accSensor.z;
-            const rollDeg = (Math.atan2(x, Math.sqrt(y * y + z * z)) * 180) / Math.PI;
-            const pitchDeg = (Math.atan2(y, Math.sqrt(x * x + z * z)) * 180) / Math.PI;
-            onSensorData(pitchDeg, rollDeg, 'سنسور شتاب کروم');
-          });
-          accSensor.addEventListener('error', (err) => {
-            console.log('Accelerometer error:', err);
-          });
-          accSensor.start();
-        } catch (e) {}
-      }
-
-      if ('RelativeOrientationSensor' in window) {
-        try {
-          const sensor = new RelativeOrientationSensor({ frequency: 60 });
-          sensor.addEventListener('reading', () => {
-            const q = sensor.quaternion;
-            const roll = Math.atan2(2 * (q[0] * q[1] + q[2] * q[3]), 1 - 2 * (q[1] * q[1] + q[2] * q[2])) * (180 / Math.PI);
-            const pitch = Math.asin(Math.max(-1, Math.min(1, 2 * (q[0] * q[2] - q[3] * q[1])))) * (180 / Math.PI);
-            onSensorData(pitch, roll, 'سنسور ژیروسکوپ کروم');
-          });
-          sensor.start();
-        } catch (e) {}
-      }
     }
 
     function requestAndStartSensors() {
       initAudio();
-      btnText.textContent = 'در حال اتصال مستقیم به سنسورها...';
+      btnText.textContent = 'در حال اتصال...';
       btnIcon.classList.add('animate-spin');
-      logMsg('در حال راه‌اندازی تمام موتورهای سنسور...');
 
-      // درخواست مجوز استاندارد در صورت وجود
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
           .then(res => {
-            if (res === 'granted') {
-              logMsg('مجوز سنسور تایید شد ✓', true);
-            } else {
-              logMsg('دسترسی رد شد — لطفاً در تنظیمات مرورگر اجازه دهید');
-            }
-          })
-          .catch(err => {
-            console.log('Permission prompt ignored:', err);
-          });
+            if (res === 'granted') logMsg('مجوز سنسور تایید شد ✓', true);
+            else logMsg('دسترسی رد شد.');
+          }).catch(err => console.log(err));
       }
 
-      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-        DeviceMotionEvent.requestPermission().catch(() => {});
-      }
-
-      // اجرای فوری و بدون معطلی هر ۳ موتور سنسور در کنار هم
-      setupGenericSensor();
       setupDeviceOrientation();
       setupDeviceMotion();
 
       setTimeout(() => {
         if (!state.hasReceivedRealData) {
           btnIcon.classList.remove('animate-spin');
-          btnText.textContent = 'تلاش مجدد برای اتصال سنسور';
-          if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-            logMsg('⚠️ خطا: مرورگر کروم اجازه سنسور را فقط روی HTTPS صادر می‌کند!');
-          } else {
-            logMsg('در حال گوش دادن به سیگنال سخت‌افزاری... گوشی را کمی حرکت دهید.');
-          }
+          btnText.textContent = 'تلاش مجدد';
+          logMsg('گوشی را کمی حرکت دهید...');
         }
       }, 1000);
     }
 
-    // رویدادهای کلیک و لمس
     bigSensorStartBtn.addEventListener('click', requestAndStartSensors);
     document.body.addEventListener('touchstart', () => {
       if (!state.hasReceivedRealData) requestAndStartSensors();
     }, { once: true });
 
-    // تلاش اولیه برای اتصال در صورت باز بودن دسترسی
-    setupDeviceOrientation();
-    setupDeviceMotion();
-    setupGenericSensor();
-
     btnCalibrate.addEventListener('click', () => {
       initAudio();
-      if (!state.hasReceivedRealData) {
-        logMsg('⚠️ ابتدا باید سنسور متصل شود تا بتوان کالیبره کرد.');
-        return;
-      }
+      if (!state.hasReceivedRealData) return;
       state.offsetBeta = state.rawBeta;
       state.offsetGamma = state.rawGamma;
       offsetInfo.textContent = `آفست: X:${state.offsetBeta.toFixed(1)}° Y:${state.offsetGamma.toFixed(1)}°`;
