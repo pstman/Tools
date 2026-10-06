@@ -56,7 +56,7 @@
 <body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col justify-between p-3 select-none">
 
   <div id="inAppWarning" class="hidden w-full max-w-md mx-auto mb-2 p-3 bg-amber-500 text-white rounded-2xl shadow-md text-xs leading-relaxed font-semibold">
-    ⚠️ <b>توجه:</b> صفحه در مرورگر داخلی پیام‌رسان باز شده که دسترسی ژیروسکوپ را قطع می‌کند. لطفاً از منوی سه‌نقطه بالای صفحه گزینه <b>«باز کردن در Chrome» (Open in browser)</b> را بزنید.
+    ⚠️ <b>توجه:</b> صفحه در مرورگر داخلی پیام‌رسان باز شده که دسترسی سنسورها را قطع می‌کند. لطفاً از منوی سه‌نقطه گزینه <b>«باز کردن در Chrome» (Open in browser)</b> را بزنید.
   </div>
 
   <header class="w-full max-w-md mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-3.5 flex items-center justify-between z-10 relative">
@@ -74,7 +74,7 @@
       <div>
         <div class="flex items-center gap-2">
           <h1 class="text-base font-extrabold text-slate-900">تراز دیجیتال گوشی</h1>
-          <span class="text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded-md font-bold tracking-tight">نسخه ۳.۰ (AR)</span>
+          <span class="text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded-md font-bold tracking-tight">نسخه ۳.۱ (دستیار صوتی)</span>
         </div>
         <p id="sensorStatusText" class="text-xs text-slate-500 font-semibold flex items-center gap-1.5">
           <span id="statusIndicator" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
@@ -84,7 +84,7 @@
     </div>
 
     <div class="flex items-center gap-1.5">
-      <button id="toggleSoundBtn" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="صدای بیپ">
+      <button id="toggleSoundBtn" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="دستیار صوتی و بیپ">
         <svg id="soundIcon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
         </svg>
@@ -134,10 +134,8 @@
       </button>
     </div>
 
-    <!-- کانتینر اصلی نمایشگرها -->
     <div class="w-full flex-1 flex flex-col items-center justify-center relative min-h-[260px] max-h-[400px]">
       
-      <!-- مد تراز حبابی کفی -->
       <div id="circularContainer" class="absolute inset-0 m-auto w-64 h-64 rounded-full light-tube border-4 border-slate-300 flex items-center justify-center shadow-xl overflow-hidden transition-opacity">
         <div class="absolute inset-0 grid-lines opacity-70 rounded-full"></div>
         <div class="absolute w-48 h-48 rounded-full border border-slate-400/40"></div>
@@ -153,7 +151,6 @@
         </div>
       </div>
 
-      <!-- مد تراز افقی -->
       <div id="horizontalContainer" class="hidden absolute inset-0 m-auto w-full h-28 rounded-2xl light-tube border-4 border-slate-300 flex items-center justify-center shadow-xl overflow-hidden px-4">
         <div class="absolute h-full w-14 border-x-2 border-slate-400 bg-slate-200/50 flex items-center justify-center">
           <div class="h-6 w-[2px] bg-slate-500"></div>
@@ -163,7 +160,6 @@
         </div>
       </div>
 
-      <!-- مد شاقول عمودی -->
       <div id="verticalContainer" class="hidden absolute inset-0 m-auto h-64 w-28 rounded-2xl light-tube border-4 border-slate-300 flex items-center justify-center shadow-xl overflow-hidden py-4">
         <div class="absolute w-full h-14 border-y-2 border-slate-400 bg-slate-200/50 flex items-center justify-center">
           <div class="w-6 h-[2px] bg-slate-500"></div>
@@ -173,11 +169,8 @@
         </div>
       </div>
 
-      <!-- مد جدید: دوربین و زاویه‌سنج تئودولیت -->
       <div id="cameraContainer" class="hidden absolute inset-0 w-full h-full rounded-2xl overflow-hidden border-4 border-slate-800 shadow-xl bg-black">
         <video id="camFeed" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline></video>
-        
-        <!-- مگسک هدف‌گیری -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
           <svg class="w-14 h-14 text-rose-500 drop-shadow-[0_0_8px_rgba(225,29,72,0.8)] opacity-80" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10" stroke-dasharray="4 4" />
@@ -185,8 +178,6 @@
             <circle cx="12" cy="12" r="1" fill="currentColor" />
           </svg>
         </div>
-
-        <!-- پنل کنترل و محاسبه زاویه روی دوربین -->
         <div class="absolute bottom-2 left-2 right-2 bg-slate-900/85 backdrop-blur-sm rounded-xl p-3 text-white shadow-2xl border border-slate-700">
           <div class="flex justify-between items-center mb-2.5">
             <button id="btnSetA" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-xs font-bold transition shadow-md active:scale-95 flex items-center gap-1.5">
@@ -215,7 +206,6 @@
 
     </div>
 
-    <!-- نمایشگرهای عددی بزرگ (برای حالت‌های غیر دوربین) -->
     <div id="standardStats" class="w-full grid grid-cols-3 gap-2.5 transition-opacity">
       <div class="bg-white border border-slate-200 rounded-2xl p-2.5 text-center shadow-sm">
         <div class="text-[11px] text-slate-500 font-semibold">شیب (Pitch)</div>
@@ -279,6 +269,8 @@
     let cameraStream = null;
     let pointA = null;
     let pointB = null;
+    let lastSpeechTime = 0;
+    const SPEECH_INTERVAL = 2500;
 
     const circularBubble = document.getElementById('circularBubble');
     const horizontalBubble = document.getElementById('horizontalBubble');
@@ -379,6 +371,64 @@
       }
     }
 
+    // تابع اصلی دستیار صوتی
+    function speakGuidance(isLevel) {
+      if (!state.soundEnabled || state.activeView === 'camera') return;
+
+      const now = performance.now();
+      const synth = window.speechSynthesis;
+
+      if (isLevel) {
+        if (now - lastSpeechTime > 1000) {
+          synth.cancel();
+          const utterance = new SpeechSynthesisUtterance("تراز شد");
+          utterance.lang = "fa-IR";
+          utterance.rate = 1.2;
+          synth.speak(utterance);
+          lastSpeechTime = now;
+        }
+        return;
+      }
+
+      if (now - lastSpeechTime < SPEECH_INTERVAL) return;
+
+      let message = "";
+      let errPitch = state.pitch;
+      let errRoll = state.roll;
+
+      // اصلاح خطای هر محور بر اساس نوع نمایش فعلی
+      if (state.activeView === 'vertical') {
+         let target = state.pitch > 0 ? 90 : -90;
+         errPitch = state.pitch - target;
+         errRoll = 0; 
+      } else if (state.activeView === 'horizontal') {
+         errPitch = 0; 
+      }
+
+      const absPitch = Math.abs(errPitch);
+      const absRoll = Math.abs(errRoll);
+
+      if (absRoll > absPitch) {
+        const direction = errRoll > 0 ? "چپ" : "راست";
+        if (absRoll > 5) message = `بده سمت ${direction}`;
+        else if (absRoll > 1) message = `کمی ${direction}`;
+        else message = `خیلی کم ${direction}`;
+      } else {
+        const direction = errPitch > 0 ? "پایین" : "بالا";
+        if (absPitch > 5) message = `سرش رو بده ${direction}`;
+        else if (absPitch > 1) message = `کمی ${direction}`;
+        else message = `یه مو ${direction}`;
+      }
+
+      if (message !== "") {
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = "fa-IR";
+        utterance.rate = 1.1;
+        synth.speak(utterance);
+        lastSpeechTime = now;
+      }
+    }
+
     function onSensorData(pitch, roll, alpha, engineName) {
       if (typeof pitch !== 'number' || typeof roll !== 'number' || isNaN(pitch) || isNaN(roll)) return;
       if (state.activeEngine === 'DeviceOrientation' && engineName !== 'DeviceOrientation') return;
@@ -457,7 +507,6 @@
     function switchView(view) {
       if (state.activeView === view) return;
       
-      // اگر از مد دوربین خارج شدیم دوربین رو خاموش کن تا باتری مصرف نشه
       if (state.activeView === 'camera') {
         stopCamera();
         standardStats.classList.remove('hidden');
@@ -541,23 +590,22 @@
         valPitch.className = 'text-2xl font-black text-slate-900 mono-num my-0.5';
         valRoll.className = 'text-2xl font-black text-slate-900 mono-num my-0.5';
       }
+
+      // فراخوانی دستیار صوتی
+      speakGuidance(isLevel);
     }
 
-    // منطق محاسبه زاویه در حالت دوربین
     function calculateCameraAngles() {
       if (!pointA || !pointB) return;
       
-      // محاسبه اختلاف افقی (yaw)
       let dAlpha = Math.abs(pointB.alpha - pointA.alpha);
-      if (dAlpha > 180) dAlpha = 360 - dAlpha; // کوتاه‌ترین مسیر چرخش
+      if (dAlpha > 180) dAlpha = 360 - dAlpha; 
       
-      // محاسبه اختلاف عمودی (pitch)
       let dBeta = Math.abs(pointB.beta - pointA.beta);
 
       diffH.textContent = dAlpha.toFixed(1) + '°';
       diffV.textContent = dBeta.toFixed(1) + '°';
       
-      // محاسبه زاویه فضایی تقریبی با قضیه فیثاغورث روی کره (برای فواصل معقول)
       let totalAngle = Math.sqrt(dAlpha * dAlpha + dBeta * dBeta);
       targetAngleDiff.textContent = totalAngle.toFixed(1) + '°';
     }
