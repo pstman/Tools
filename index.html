@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>تراز مهندسی دیجیتال و حبابی دقیق</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Vazirmatn -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      touch-action: none; /* جلوگیری کامل از اسکرول و پرش صفحه هنگام لمس */
+      user-select: none;
+      -webkit-user-select: none;
+      overscroll-behavior: none;
+    }
+    .mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Liquid glass effect */
+    .glass-tube {
+      background: radial-gradient(circle at 50% 30%, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.95));
+      box-shadow: inset 0 3px 12px rgba(0, 0, 0, 0.8), 0 8px 30px rgba(0, 0, 0, 0.6);
+    }
+    .bubble-sphere {
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #10b981 70%, #047857 100%);
+      box-shadow: 0 0 15px rgba(52, 211, 153, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+    }
+    .bubble-sphere.unlevel {
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fed7aa 30%, #f97316 70%, #c2410c 100%);
+      box-shadow: 0 0 15px rgba(249, 115, 22, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+    }
+    .grid-lines {
+      background-size: 20px 20px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    }
+    /* Pulse effect when calibrated or level */
+    @keyframes pulse-level {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+    .active-level-glow {
+      animation: pulse-level 1.2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-emerald-500 selection:text-white">
+
+  <header class="w-full bg-slate-900/90 border-b border-slate-800 backdrop-blur-md px-4 py-2.5 sticky top-0 z-40">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <svg class="w-4 h-4 text-slate-950" fill="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none" />
+            <circle cx="12" cy="12" r="3" fill="currentColor" />
+            <line x1="12" y1="1" x2="12" y2="5" stroke="currentColor" stroke-width="2" />
+            <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2" />
+            <line x1="1" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" />
+            <line x1="19" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold text-slate-100 flex items-center gap-1.5">
+            تراز لیزری و دیجیتال
+            <span class="text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded-full">v2.1</span>
+          </h1>
+          <p id="sensorStatusText" class="text-[10px] text-slate-400">سنسور: آماده دریافت داده</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <!-- Physics behavior toggle: Bubble vs Marble -->
+        <button id="togglePhysicsBtn" class="px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-amber-300 font-medium hover:bg-slate-700 transition active:scale-95" title="تغییر حالت فیزیک">
+          <span id="physicsModeLabel">حباب هوا 🫧</span>
+        </button>
+        <!-- Sound toggle -->
+        <button id="toggleSoundBtn" class="p-2 rounded-lg bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition active:scale-95" title="صدای بوق تراز">
+          <svg id="soundIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+        </button>
+        <!-- Haptic toggle -->
+        <button id="toggleHapticBtn" class="p-2 rounded-lg bg-slate-800 border border-slate-700/80 text-emerald-400 hover:text-white transition active:scale-95" title="ویبره هنگام تراز">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 10v4M20 10v4M1 8v8M23 8v8" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Big Sensor Start Button Overlay for Android/Chrome & iOS permission unlock -->
+  <div id="sensorUnlockOverlay" class="w-full max-w-md mx-auto px-4 mt-3">
+    <button id="bigSensorStartBtn" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 active:scale-98 transition animate-pulse">
+      <svg class="w-5 h-5 text-slate-950" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+      </svg>
+      <span>برای فعال‌سازی سنسور ژیروسکوپ اینجا لمس کنید 👆</span>
+    </button>
+  </div>
+
+  <!-- راهنمای رفع خطای دسترسی کروم در صورت مسدود بودن سنسور -->
+  <div id="permissionHelpCard" class="hidden w-full max-w-md mx-auto px-4 mt-2">
+    <div class="bg-rose-950/80 border border-rose-600/50 rounded-2xl p-3.5 text-xs text-rose-200">
+      <div class="flex items-center gap-2 font-bold text-rose-300 text-sm mb-1.5">
+        <svg class="w-5 h-5 shrink-0 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <span>علت خطا: سنسور در کروم غیرفعال است</span>
+      </div>
+      <p class="leading-5 mb-2 text-slate-300">
+        کروم در حالت باز کردن فایل محلی یا تنظیمات امنیتی، اجازه سنسور را می‌بندد. برای فعال‌‌سازی فوری در گوشی:
+      </p>
+      <ol class="list-decimal list-inside space-y-1 text-slate-300 bg-slate-900/80 p-2.5 rounded-xl border border-rose-900/60 font-medium">
+        <li>روی آیکون <strong class="text-white">۳ نقطه بالای کروم</strong> ضربه بزنید.</li>
+        <li>وارد <strong class="text-white">تنظیمات (Settings)</strong> > <strong class="text-white">Site settings (تنظیمات سایت)</strong> شوید.</li>
+        <li>گزینه <strong class="text-emerald-400">Motion sensors (سنسورهای حرکتی)</strong> را روی حالت <strong class="text-emerald-400">مجاز (Allowed)</strong> بگذارید.</li>
+        <li>سپس صفحه را رفرش کنید یا دکمه زیر را برای تست لمسی بزنید.</li>
+      </ol>
+      <div class="mt-2.5 flex items-center gap-2">
+        <button id="enableManualModeBtn" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-1.5 px-3 rounded-lg text-xs transition active:scale-95">
+          شبیه‌ساز لمسی با دست (بدون نیاز به سنسور)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-md mx-auto w-full px-4 py-2.5 flex-1 flex flex-col items-center justify-between gap-3">
+    
+    <!-- Mode Switcher Tabs + Auto Mode -->
+    <div class="w-full bg-slate-900 p-1 rounded-2xl border border-slate-800 flex items-center gap-1 shadow-inner text-xs">
+      <button data-mode="auto" class="mode-tab flex-1 py-1.5 rounded-xl font-bold transition flex items-center justify-center gap-1 bg-emerald-500 text-slate-950 shadow-md">
+        <span>خودکار ⚡</span>
+      </button>
+      <button data-mode="circle" class="mode-tab flex-1 py-1.5 rounded-xl font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-1">
+        <span>سطحی (کف)</span>
+      </button>
+      <button data-mode="horizontal" class="mode-tab flex-1 py-1.5 rounded-xl font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-1">
+        <span>لبه افقی</span>
+      </button>
+      <button data-mode="vertical" class="mode-tab flex-1 py-1.5 rounded-xl font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-1">
+        <span>دیوار/عمود</span>
+      </button>
+    </div>
+
+    <!-- Sensitivity / Range Controls -->
+    <div class="w-full flex items-center justify-between px-1 text-xs">
+      <div class="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
+        <span class="text-[10px] text-slate-400 px-1.5 font-medium">بازه زاویه:</span>
+        <button id="rangeWideBtn" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+          کامل (±۹۰°)
+        </button>
+        <button id="rangePreciseBtn" class="px-2 py-0.5 rounded-lg text-slate-400 font-medium hover:text-white">
+          دقیق (±۱۵°)
+        </button>
+      </div>
+
+      <!-- Quick Reset Zero to current hand pose -->
+      <button id="quickZeroBtn" class="bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 px-2.5 py-1 rounded-xl font-semibold flex items-center gap-1 transition text-[11px] active:scale-95" title="زاویه فعلی گوشی در دست را مبنا قرار بده">
+        🎯 صفر کردن در دست
+      </button>
+    </div>
+
+    <!-- Precision Status Badge -->
+    <div class="flex items-center justify-between w-full px-2">
+      <div id="statusIndicator" class="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1 rounded-full text-xs font-medium text-slate-300">
+        <span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+        <span id="statusText">در حال دریافت زاویه...</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="calibratedBadge" class="text-[11px] font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full hidden">
+          ✓ کالیبره
+        </span>
+        <button id="freezeBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span id="freezeBtnText">ثابت کردن</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Visual Canvas Stage -->
+    <div class="w-full flex-1 flex flex-col items-center justify-center relative min-h-[280px]">
+
+      <!-- Mode 1: Circular / Bull's Eye View -->
+      <div id="circularContainer" class="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full glass-tube border-4 border-slate-700 flex items-center justify-center shadow-2xl overflow-hidden transition-all duration-300">
+        <!-- Target Rings & Crosshair -->
+        <div class="absolute inset-0 grid-lines opacity-40 rounded-full"></div>
+        <div class="absolute w-52 h-52 rounded-full border border-slate-600/40"></div>
+        <div class="absolute w-36 h-36 rounded-full border border-slate-600/60"></div>
+        <div class="absolute w-20 h-20 rounded-full border border-slate-500/80"></div>
+        
+        <!-- Target center zone (Level zone) -->
+        <div id="targetCenter" class="absolute w-12 h-12 rounded-full border-2 border-dashed border-emerald-400/70 flex items-center justify-center bg-emerald-500/5 transition-colors duration-200">
+          <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+        </div>
+        <!-- Crosshairs -->
+        <div class="absolute w-full h-[1px] bg-slate-600/50 pointer-events-none"></div>
+        <div class="absolute h-full w-[1px] bg-slate-600/50 pointer-events-none"></div>
+
+        <!-- Direction Indicators -->
+        <span class="absolute top-2 text-[10px] text-slate-500 font-mono">بالا (Pitch-)</span>
+        <span class="absolute bottom-2 text-[10px] text-slate-500 font-mono">پایین (Pitch+)</span>
+        <span class="absolute right-2 text-[10px] text-slate-500 font-mono">راست</span>
+        <span class="absolute left-2 text-[10px] text-slate-500 font-mono">چپ</span>
+
+        <!-- The Floating Bubble / Ball -->
+        <div id="circularBubble" class="absolute w-11 h-11 rounded-full bubble-sphere flex items-center justify-center cursor-grab transition-transform duration-75">
+          <div class="w-2.5 h-2.5 rounded-full bg-white/70 blur-[0.5px]"></div>
+        </div>
+      </div>
+
+      <!-- Mode 2: Horizontal Tubular View -->
+      <div id="horizontalContainer" class="hidden w-full max-w-sm h-32 rounded-3xl glass-tube border-4 border-slate-700 relative flex items-center justify-center shadow-2xl overflow-hidden px-4">
+        <!-- Center reference marks -->
+        <div class="absolute h-full w-14 border-x-2 border-emerald-400/80 bg-emerald-500/10 flex items-center justify-center">
+          <div class="h-6 w-[2px] bg-emerald-400"></div>
+        </div>
+        <!-- Bubble -->
+        <div id="horizontalBubble" class="absolute w-11 h-11 rounded-full bubble-sphere flex items-center justify-center">
+          <div class="w-2.5 h-2.5 rounded-full bg-white/70"></div>
+        </div>
+      </div>
+
+      <!-- Mode 3: Vertical Plumb View -->
+      <div id="verticalContainer" class="hidden h-64 sm:h-72 w-32 rounded-3xl glass-tube border-4 border-slate-700 relative flex items-center justify-center shadow-2xl overflow-hidden py-4">
+        <!-- Center reference marks -->
+        <div class="absolute w-full h-14 border-y-2 border-emerald-400/80 bg-emerald-500/10 flex items-center justify-center">
+          <div class="w-6 h-[2px] bg-emerald-400"></div>
+        </div>
+        <!-- Bubble -->
+        <div id="verticalBubble" class="absolute w-11 h-11 rounded-full bubble-sphere flex items-center justify-center">
+          <div class="w-2.5 h-2.5 rounded-full bg-white/70"></div>
+        </div>
+      </div>
+
+      <div class="text-[11px] text-slate-400 mt-2 text-center flex items-center gap-2">
+        <span id="activeModeDesc">تراز سطحی (برای قرار دادن روی میز یا سنگ)</span>
+      </div>
+    </div>
+
+    <div class="w-full grid grid-cols-3 gap-2 text-center">
+      <!-- Pitch (X) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2">
+        <div class="text-[10px] text-slate-400 font-medium">محور شیب (Pitch)</div>
+        <div id="valPitch" class="text-lg sm:text-xl font-black text-emerald-400 mono-num mt-0.5">0.0°</div>
+        <div id="rawBetaText" class="text-[9px] text-slate-500 mono-num">خام: 0.0°</div>
+      </div>
+      <!-- Roll (Y) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2">
+        <div class="text-[10px] text-slate-400 font-medium">محور چرخش (Roll)</div>
+        <div id="valRoll" class="text-lg sm:text-xl font-black text-emerald-400 mono-num mt-0.5">0.0°</div>
+        <div id="rawGammaText" class="text-[9px] text-slate-500 mono-num">خام: 0.0°</div>
+      </div>
+      <!-- Total Inclination -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2">
+        <div class="text-[10px] text-slate-400 font-medium">انحراف کلی</div>
+        <div id="valDeviation" class="text-lg sm:text-xl font-black text-emerald-400 mono-num mt-0.5">0.0°</div>
+        <div id="valStatusWord" class="text-[10px] text-emerald-500 font-semibold">تراز دقیق</div>
+      </div>
+    </div>
+
+    <div class="w-full bg-slate-900/80 border border-slate-800 rounded-2xl p-3 flex flex-col gap-2">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-bold text-slate-300 flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          کالیبراسیون و جبران لنز دوربین
+        </span>
+        <span id="offsetInfo" class="text-[10px] text-slate-400 mono-num">آفست: X:0.0° Y:0.0°</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 mt-1">
+        <button id="btnCalibrate" class="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-bold text-xs py-2 px-3 rounded-xl shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-1.5 active:scale-95 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          کالیبره کن (صفر کردن روی سطح)
+        </button>
+        <button id="btnResetCalib" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 active:scale-95 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          ریست به حالت اولیه
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Notification Toast Modal -->
+  <div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto bg-slate-900/95 border border-emerald-500/50 shadow-2xl rounded-2xl p-3 flex items-center gap-3 translate-y-24 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+    <div id="toastIconContainer" class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <div id="toastMsg" class="text-xs font-semibold text-slate-200">
+      عملیات با موفقیت انجام شد.
+    </div>
+  </div>
+
+  <script>
+    // App State
+    const state = {
+      userSelectedMode: 'auto', // 'auto', 'circle', 'horizontal', 'vertical'
+      currentActiveMode: 'circle',
+      physicsMode: 'bubble', // 'bubble' or 'ball'
+      rangeMode: 'wide',     // 'wide' or 'precise'
+      pitch: 0,              // adjusted beta
+      roll: 0,               // adjusted gamma
+      rawBeta: 0,
+      rawGamma: 0,
+      offsetBeta: 0,
+      offsetGamma: 0,
+      isFrozen: false,
+      soundEnabled: true,
+      hapticEnabled: true,
+      tolerance: 0.4,
+      hasSensor: false,
+      lastBeepTime: 0,
+      packetCount: 0,
+      manualTouchMode: false
+    };
+
+    const permissionHelpCard = document.getElementById('permissionHelpCard');
+    const enableManualModeBtn = document.getElementById('enableManualModeBtn');
+    function showPermissionError(msg) {
+      if (permissionHelpCard) permissionHelpCard.classList.remove('hidden');
+      if (sensorStatusText) {
+        sensorStatusText.textContent = 'خطا: مجوز سنسور در کروم مسدود است ❌';
+        sensorStatusText.className = 'text-[10px] text-rose-400 font-bold';
+      }
+      showToast(msg || 'دسترسی سنسور توسط کروم رد شد');
+    }
+
+    // شبیه‌ساز لمسی برای وقتی که مرورگر سنسور را به دلایل امنیتی قطع کرده است
+    if (enableManualModeBtn) {
+      enableManualModeBtn.addEventListener('click', () => {
+        state.manualTouchMode = true;
+        sensorUnlockOverlay.classList.add('hidden');
+        permissionHelpCard.classList.add('hidden');
+        sensorStatusText.textContent = 'حالت دستی (لمس و درگ روی حباب فعال است) 🕹️';
+        sensorStatusText.className = 'text-[10px] text-amber-400 font-bold';
+        showToast('حالت شبیه‌ساز فعال شد؛ حباب را با انگشت جابجا کنید');
+      });
+    }
+
+    // قابلیت جابجایی دستی در صورت کار نکردن سنسور
+    let isDragging = false;
+    const dragTarget = document.getElementById('circularContainer');
+    if (dragTarget) {
+      const handlePointer = (clientX, clientY) => {
+        const rect = dragTarget.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = clientX - centerX;
+        const dy = clientY - centerY;
+        // تبدیل موقعیت پوینتر به زاویه
+        const simRoll = (dx / (rect.width / 2)) * 45;
+        const simPitch = (dy / (rect.height / 2)) * 45;
+        updateSensorAngles(simPitch, simRoll);
+      };
+
+      dragTarget.addEventListener('pointerdown', (e) => {
+        if (!state.hasSensor || state.manualTouchMode) {
+          isDragging = true;
+          handlePointer(e.clientX, e.clientY);
+        }
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (isDragging) {
+          handlePointer(e.clientX, e.clientY);
+        }
+      });
+      window.addEventListener('pointerup', () => {
+        isDragging = false;
+      });
+    }
+    } catch (e) {
+      console.warn("Could not load calibration:", e);
+    }
+
+    // DOM Elements
+    const circularBubble = document.getElementById('circularBubble');
+    const horizontalBubble = document.getElementById('horizontalBubble');
+    const verticalBubble = document.getElementById('verticalBubble');
+    const targetCenter = document.getElementById('targetCenter');
+    const circularContainer = document.getElementById('circularContainer');
+    const horizontalContainer = document.getElementById('horizontalContainer');
+    const verticalContainer = document.getElementById('verticalContainer');
+    const modeTabs = document.querySelectorAll('.mode-tab');
+    const valPitch = document.getElementById('valPitch');
+    const valRoll = document.getElementById('valRoll');
+    const valDeviation = document.getElementById('valDeviation');
+    const rawBetaText = document.getElementById('rawBetaText');
+    const rawGammaText = document.getElementById('rawGammaText');
+    const valStatusWord = document.getElementById('valStatusWord');
+    const statusText = document.getElementById('statusText');
+    const statusDot = document.getElementById('statusDot');
+    const offsetInfo = document.getElementById('offsetInfo');
+    const calibratedBadge = document.getElementById('calibratedBadge');
+    const freezeBtn = document.getElementById('freezeBtn');
+    const freezeBtnText = document.getElementById('freezeBtnText');
+    const toggleSoundBtn = document.getElementById('toggleSoundBtn');
+    const soundIcon = document.getElementById('soundIcon');
+    const toggleHapticBtn = document.getElementById('toggleHapticBtn');
+    const togglePhysicsBtn = document.getElementById('togglePhysicsBtn');
+    const physicsModeLabel = document.getElementById('physicsModeLabel');
+    const rangeWideBtn = document.getElementById('rangeWideBtn');
+    const rangePreciseBtn = document.getElementById('rangePreciseBtn');
+    const quickZeroBtn = document.getElementById('quickZeroBtn');
+    const btnCalibrate = document.getElementById('btnCalibrate');
+    const btnResetCalib = document.getElementById('btnResetCalib');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    const sensorUnlockOverlay = document.getElementById('sensorUnlockOverlay');
+    const bigSensorStartBtn = document.getElementById('bigSensorStartBtn');
+    const sensorStatusText = document.getElementById('sensorStatusText');
+    const activeModeDesc = document.getElementById('activeModeDesc');
+
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playBeep(freq = 880, duration = 0.08) {
+      if (!state.soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (err) {}
+    }
+
+    function triggerHaptic() {
+      if (!state.hapticEnabled) return;
+      if (navigator.vibrate) {
+        try { navigator.vibrate(35); } catch (e) {}
+      }
+    }
+
+    function showToast(message) {
+      toastMsg.textContent = message;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 2400);
+    }
+
+    function updateCalibUI() {
+      const hasOffset = Math.abs(state.offsetBeta) > 0.05 || Math.abs(state.offsetGamma) > 0.05;
+      if (hasOffset) {
+        calibratedBadge.classList.remove('hidden');
+        offsetInfo.textContent = `آفست: X:${state.offsetBeta.toFixed(1)}° Y:${state.offsetGamma.toFixed(1)}°`;
+      } else {
+        calibratedBadge.classList.add('hidden');
+        offsetInfo.textContent = `آفست: X:0.0° Y:0.0°`;
+      }
+    }
+    updateCalibUI();
+
+    togglePhysicsBtn.addEventListener('click', () => {
+      if (state.physicsMode === 'bubble') {
+        state.physicsMode = 'ball';
+        physicsModeLabel.textContent = 'گوی فلزی ⚪';
+        togglePhysicsBtn.className = 'px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-sky-300 font-medium hover:bg-slate-700 transition active:scale-95';
+        showToast('حالت گوی فلزی (سقوط به پایین)');
+      } else {
+        state.physicsMode = 'bubble';
+        physicsModeLabel.textContent = 'حباب هوا 🫧';
+        togglePhysicsBtn.className = 'px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-amber-300 font-medium hover:bg-slate-700 transition active:scale-95';
+        showToast('حالت حباب شناور (حرکت به بالا)');
+      }
+      renderLevel();
+    });
+
+    rangeWideBtn.addEventListener('click', () => {
+      state.rangeMode = 'wide';
+      rangeWideBtn.className = 'px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30';
+      rangePreciseBtn.className = 'px-2 py-0.5 rounded-lg text-slate-400 font-medium hover:text-white';
+      showToast('نمای باز (تا ۹۰ درجه)');
+      renderLevel();
+    });
+
+    rangePreciseBtn.addEventListener('click', () => {
+      state.rangeMode = 'precise';
+      rangePreciseBtn.className = 'px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30';
+      rangeWideBtn.className = 'px-2 py-0.5 rounded-lg text-slate-400 font-medium hover:text-white';
+      showToast('حالت دقت بالا (±۱۵ درجه)');
+      renderLevel();
+    });
+
+    quickZeroBtn.addEventListener('click', () => {
+      initAudio();
+      state.offsetBeta = state.rawBeta;
+      state.offsetGamma = state.rawGamma;
+      updateCalibUI();
+      playBeep(1100, 0.1);
+      showToast('زاویه فعلی به عنوان صفر مبنا تنظیم شد');
+      renderLevel();
+    });
+
+    // Mode Selection UI
+    modeTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        modeTabs.forEach(t => {
+          t.classList.remove('bg-emerald-500', 'text-slate-950', 'shadow-md', 'font-bold');
+          t.classList.add('text-slate-400', 'font-semibold');
+        });
+        tab.classList.add('bg-emerald-500', 'text-slate-950', 'shadow-md', 'font-bold');
+        tab.classList.remove('text-slate-400', 'font-semibold');
+
+        state.userSelectedMode = tab.dataset.mode;
+        applyActiveView();
+        renderLevel();
+      });
+    });
+
+    function applyActiveView() {
+      let targetView = state.userSelectedMode;
+      if (state.userSelectedMode === 'auto') {
+        const absBeta = Math.abs(state.rawBeta);
+        const absGamma = Math.abs(state.rawGamma);
+
+        if (absBeta > 60) {
+          targetView = 'vertical';
+        } else if (absGamma > 55) {
+          targetView = 'horizontal';
+        } else {
+          targetView = 'circle';
+        }
+      }
+
+      state.currentActiveMode = targetView;
+
+      circularContainer.classList.add('hidden');
+      horizontalContainer.classList.add('hidden');
+      verticalContainer.classList.add('hidden');
+
+      if (targetView === 'circle') {
+        circularContainer.classList.remove('hidden');
+        activeModeDesc.textContent = state.userSelectedMode === 'auto' 
+          ? 'خودکار: تراز سطحی (گوشی به صورت افقی/تخت است)' 
+          : 'تراز سطحی (برای قرار دادن روی میز یا سنگ)';
+      } else if (targetView === 'horizontal') {
+        horizontalContainer.classList.remove('hidden');
+        activeModeDesc.textContent = state.userSelectedMode === 'auto'
+          ? 'خودکار: تراز لبه (گوشی روی لبه پهلو قرار دارد)'
+          : 'تراز لبه افقی (قفسه و قاب عکس)';
+      } else if (targetView === 'vertical') {
+        verticalContainer.classList.remove('hidden');
+        activeModeDesc.textContent = state.userSelectedMode === 'auto'
+          ? 'خودکار: شاقول/دیوار (گوشی ایستاده است)'
+          : 'تراز عمودی و شاقول (دیوار و ستون)';
+      }
+    }
+
+    let smoothedBeta = 0;
+    let smoothedGamma = 0;
+    const SMOOTH_FACTOR = 0.35; // سریع‌تر و بدون تاخیر
+
+    // پردازش داده‌های ورودی سنسور
+    function updateSensorAngles(beta, gamma) {
+      if (state.isFrozen) return;
+      if (beta === null || gamma === null || typeof beta === 'undefined') return;
+
+      state.packetCount++;
+      if (!state.hasSensor) {
+        state.hasSensor = true;
+        sensorStatusText.textContent = 'سنسور ژیروسکوپ زنده فعال شد ✓';
+        sensorStatusText.className = 'text-[10px] text-emerald-400 font-bold';
+        sensorUnlockOverlay.classList.add('hidden');
+      }
+
+      state.rawBeta = beta;
+      state.rawGamma = gamma;
+
+      // فیلتر سریع جهت از بین بردن نویز میکرو
+      smoothedBeta = smoothedBeta + SMOOTH_FACTOR * (beta - smoothedBeta);
+      smoothedGamma = smoothedGamma + SMOOTH_FACTOR * (gamma - smoothedGamma);
+
+      state.pitch = smoothedBeta - state.offsetBeta;
+      state.roll = smoothedGamma - state.offsetGamma;
+
+      rawBetaText.textContent = `خام: ${beta.toFixed(1)}°`;
+      rawGammaText.textContent = `خام: ${gamma.toFixed(1)}°`;
+
+      if (state.userSelectedMode === 'auto') {
+        applyActiveView();
+      }
+
+      renderLevel();
+    }
+
+    function handleOrientation(event) {
+      updateSensorAngles(event.beta, event.gamma);
+    }
+
+    // پشتیبانی جایگزین از شتاب‌سنج (Accelerometer / Devicemotion) در صورتی که رویداد orientation مسدود باشد
+    function handleMotion(event) {
+      if (state.packetCount > 10) return; // اگر orientation کار کرد، نیازی به motion نیست
+      const acc = event.accelerationIncludingGravity;
+      if (!acc || acc.x === null) return;
+
+      // محاسبه زاویه pitch و roll از روی بردارهای گرانش زمین
+      const x = acc.x;
+      const y = acc.y;
+      const z = acc.z;
+
+      // Roll: شیب افقی (محور X)
+      const rollDeg = (Math.atan2(x, Math.sqrt(y * y + z * z)) * 180) / Math.PI;
+      // Pitch: شیب عمودی (محور Y)
+      const pitchDeg = (Math.atan2(y, Math.sqrt(x * x + z * z)) * 180) / Math.PI;
+
+      updateSensorAngles(pitchDeg, rollDeg);
+    }
+
+    function renderLevel() {
+      const pitch = state.pitch;
+      const roll = state.roll;
+
+      let totalDeviation = 0;
+      let isLevel = false;
+
+      const physicsMultiplier = (state.physicsMode === 'bubble') ? -1 : 1;
+      const circleScale = (state.rangeMode === 'wide') ? 1.25 : 6.0;
+      const linearScale = (state.rangeMode === 'wide') ? 1.4 : 7.0;
+
+      if (state.currentActiveMode === 'circle') {
+        totalDeviation = Math.sqrt(pitch * pitch + roll * roll);
+        isLevel = totalDeviation < state.tolerance;
+
+        const maxRadius = 100;
+        let dx = roll * circleScale * physicsMultiplier;
+        let dy = pitch * circleScale * physicsMultiplier;
+
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > maxRadius) {
+          dx = (dx / dist) * maxRadius;
+          dy = (dy / dist) * maxRadius;
+        }
+
+        circularBubble.style.transform = `translate(${dx}px, ${dy}px)`;
+        if (isLevel) {
+          circularBubble.classList.remove('unlevel');
+          targetCenter.classList.add('active-level-glow', 'bg-emerald-500/20', 'border-emerald-400');
+        } else {
+          circularBubble.classList.add('unlevel');
+          targetCenter.classList.remove('active-level-glow', 'bg-emerald-500/20', 'border-emerald-400');
+        }
+
+      } else if (state.currentActiveMode === 'horizontal') {
+        totalDeviation = Math.abs(roll);
+        isLevel = totalDeviation < state.tolerance;
+
+        const maxRange = 125;
+        let dx = Math.max(-maxRange, Math.min(maxRange, roll * linearScale * physicsMultiplier));
+        horizontalBubble.style.transform = `translateX(${dx}px)`;
+
+        if (isLevel) {
+          horizontalBubble.classList.remove('unlevel');
+        } else {
+          horizontalBubble.classList.add('unlevel');
+        }
+
+      } else if (state.currentActiveMode === 'vertical') {
+        let dev = Math.abs(Math.abs(pitch) - 90);
+        totalDeviation = dev;
+        isLevel = dev < state.tolerance;
+
+        const maxRange = 105;
+        let dy = Math.max(-maxRange, Math.min(maxRange, (Math.abs(pitch) - 90) * linearScale * physicsMultiplier));
+        verticalBubble.style.transform = `translateY(${dy}px)`;
+
+        if (isLevel) {
+          verticalBubble.classList.remove('unlevel');
+        } else {
+          verticalBubble.classList.add('unlevel');
+        }
+      }
+
+      // به روز رسانی فوری اعداد با رنگ‌های مشخص
+      valPitch.textContent = `${Math.abs(pitch).toFixed(1)}°`;
+      valRoll.textContent = `${Math.abs(roll).toFixed(1)}°`;
+      valDeviation.textContent = `${totalDeviation.toFixed(1)}°`;
+
+      const now = performance.now();
+      if (isLevel) {
+        statusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+        statusText.textContent = 'کاملاً تراز (۰.۰°)';
+        statusText.className = 'text-emerald-400 font-bold';
+        valStatusWord.textContent = 'تراز استاندارد';
+        valStatusWord.className = 'text-[10px] text-emerald-400 font-bold';
+
+        if (now - state.lastBeepTime > 1000) {
+          playBeep(940, 0.12);
+          triggerHaptic();
+          state.lastBeepTime = now;
+        }
+      } else {
+        statusDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse';
+        statusText.textContent = `انحراف: ${totalDeviation.toFixed(1)}°`;
+        statusText.className = 'text-amber-400 font-medium';
+        valStatusWord.textContent = totalDeviation < 2 ? 'نزدیک به تراز' : 'ناهموار';
+        valStatusWord.className = totalDeviation < 2 ? 'text-[10px] text-amber-400 font-semibold' : 'text-[10px] text-slate-500 font-semibold';
+      }
+    }
+
+    // باز کردن قفل سنسورها با کلیک کاربر (مورد نیاز استاندارد مرورگرها)
+    function unlockSensors() {
+      initAudio();
+      
+      // اگر در آیفون/iOS هستیم
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+          .then(perm => {
+            if (perm === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation, true);
+              window.addEventListener('devicemotion', handleMotion, true);
+              sensorUnlockOverlay.classList.add('hidden');
+              if (permissionHelpCard) permissionHelpCard.classList.add('hidden');
+              showToast('سنسورها متصل شدند');
+            } else {
+              showPermissionError('دسترسی سنسور رد شد؛ از تنظیمات مرورگر اجازه دهید');
+            }
+          })
+          .catch(e => {
+            console.error(e);
+            showPermissionError('خطا در دسترسی به سنسور iOS');
+          });
+      } else {
+        // برای اندروید و کروم
+        try {
+          window.addEventListener('deviceorientation', handleOrientation, true);
+          window.addEventListener('devicemotion', handleMotion, true);
+          
+          // چک کردن وضعیت مجوز در صورت پشتیبانی مرورگر
+          if (navigator.permissions && navigator.permissions.query) {
+            navigator.permissions.query({ name: 'accelerometer' }).then(result => {
+              if (result.state === 'denied') {
+                showPermissionError('سنسور حرکتی در تنظیمات کروم مسدود شده است');
+              }
+            }).catch(() => {});
+          }
+
+          // تلاش برای استفاده از Sensor API مدرن در کروم اندروید
+          if ('AbsoluteOrientationSensor' in window) {
+            const sensor = new AbsoluteOrientationSensor({ frequency: 60 });
+            sensor.addEventListener('reading', () => {
+              const q = sensor.quaternion;
+              const sinr_cosp = 2 * (q[3] * q[0] + q[1] * q[2]);
+              const cosr_cosp = 1 - 2 * (q[0] * q[0] + q[1] * q[1]);
+              const roll = Math.atan2(sinr_cosp, cosr_cosp) * (180 / Math.PI);
+
+              const sinp = 2 * (q[3] * q[1] - q[2] * q[0]);
+              const pitch = (Math.abs(sinp) >= 1 ? Math.sign(sinp) * Math.PI / 2 : Math.asin(sinp)) * (180 / Math.PI);
+
+              updateSensorAngles(pitch, roll);
+            });
+            sensor.addEventListener('error', (event) => {
+              if (event.error.name === 'NotAllowedError') {
+                showPermissionError('دسترسی سنسور توسط کروم مسدود شد (NotAllowedError)');
+              }
+            });
+            sensor.start();
+          }
+        } catch(err) {
+          console.warn("Sensor error:", err);
+          showPermissionError();
+        }
+      }
+    }
+
+    bigSensorStartBtn.addEventListener('click', unlockSensors);
+    document.body.addEventListener('click', () => {
+      if (!state.hasSensor) unlockSensors();
+    }, { once: true });
+
+    // ثبت خودکار Event Listenerها در ابتدای لود
+    window.addEventListener('deviceorientation', handleOrientation, true);
+    window.addEventListener('devicemotion', handleMotion, true);
+
+    // دکمه‌های کالیبراسیون
+    btnCalibrate.addEventListener('click', () => {
+      initAudio();
+      state.offsetBeta = state.rawBeta;
+      state.offsetGamma = state.rawGamma;
+      try {
+        localStorage.setItem('digital_level_calib', JSON.stringify({
+          beta: state.offsetBeta,
+          gamma: state.offsetGamma
+        }));
+      } catch (e) {}
+
+      updateCalibUI();
+      playBeep(1200, 0.15);
+      showToast('زاویه فعلی به عنوان صفر مبنا (تراز) ذخیره شد');
+      renderLevel();
+    });
+
+    btnResetCalib.addEventListener('click', () => {
+      initAudio();
+      state.offsetBeta = 0;
+      state.offsetGamma = 0;
+      try {
+        localStorage.removeItem('digital_level_calib');
+      } catch (e) {}
+
+      updateCalibUI();
+      playBeep(440, 0.1);
+      showToast('کالیبراسیون به حالت کارخانه بازگشت');
+      renderLevel();
+    });
+
+    // Freeze Button
+    freezeBtn.addEventListener('click', () => {
+      state.isFrozen = !state.isFrozen;
+      if (state.isFrozen) {
+        freezeBtn.classList.add('bg-amber-600', 'text-white', 'border-amber-500');
+        freezeBtnText.textContent = 'ادامه سنجش';
+        showToast('زاویه قفل شد');
+      } else {
+        freezeBtn.classList.remove('bg-amber-600', 'text-white', 'border-amber-500');
+        freezeBtnText.textContent = 'ثابت کردن';
+        showToast('سنجش فعال شد');
+      }
+    });
+
+    toggleSoundBtn.addEventListener('click', () => {
+      initAudio();
+      state.soundEnabled = !state.soundEnabled;
+      if (state.soundEnabled) {
+        soundIcon.classList.remove('text-slate-500');
+        soundIcon.classList.add('text-slate-300');
+        showToast('صدای تراز فعال شد');
+      } else {
+        soundIcon.classList.remove('text-slate-300');
+        soundIcon.classList.add('text-slate-500');
+        showToast('صدای تراز قطع شد');
+      }
+    });
+
+    toggleHapticBtn.addEventListener('click', () => {
+      state.hapticEnabled = !state.hapticEnabled;
+      if (state.hapticEnabled) {
+        toggleHapticBtn.classList.remove('text-slate-500');
+        toggleHapticBtn.classList.add('text-emerald-400');
+        triggerHaptic();
+        showToast('ویبره تراز فعال شد');
+      } else {
+        toggleHapticBtn.classList.remove('text-emerald-400');
+        toggleHapticBtn.classList.add('text-slate-500');
+        showToast('ویبره خاموش شد');
+      }
+    });
+
+    renderLevel();
+  </script>
+</body>
+</html>
